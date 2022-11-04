@@ -1,4 +1,6 @@
-﻿internal partial class Program
+﻿using System.Text.RegularExpressions;
+
+internal partial class Program
 {
     public static class FileManager
     {
@@ -23,10 +25,35 @@
             
             Console.WriteLine();
         }
-
-        public static void FilesUnionWithoutStrings(params string[] strings)
+        
+        public static void FIlesUnion()
         {
+            var files = Directory.GetFiles("Files");
+            var resultfile = "Files" + Path.DirectorySeparatorChar + "result.txt";
+            using (Stream outputStream = File.OpenWrite(resultfile))
+            {
+                foreach (string inputFile in files)
+                {
+                    using (Stream inputStream = File.OpenRead(inputFile))
+                    {
+                        inputStream.CopyTo(outputStream);
+                    }
+                }
+            }
+        }
 
+        public static void RemoveStringsFromFile(string fileName, params string[] strings)
+        {
+            bool Match(string str)
+            {
+                bool result = true;
+                Parallel.For(0, strings.Length, i =>
+                {
+                    if (Regex.IsMatch(str, Regex.Escape(strings[i]))) result = false;
+                });
+                return result;
+            }
+            File.WriteAllLines(fileName, File.ReadLines(fileName).Where(l => Match(l)).ToList());
         }
     }
 }
