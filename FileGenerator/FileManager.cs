@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Runtime.Intrinsics.X86;
+using System.Text.RegularExpressions;
+using MySqlConnector;
 
 internal partial class Program
 {
@@ -26,8 +28,12 @@ internal partial class Program
             Console.WriteLine();
         }
         
-        public static void FIlesUnion()
+        public static void FilesUnion()
         {
+            if (File.Exists("Files" + Path.DirectorySeparatorChar + "result.txt"))
+            {
+                File.Delete("Files" + Path.DirectorySeparatorChar + "result.txt");
+            }
             var files = Directory.GetFiles("Files");
             var resultfile = "Files" + Path.DirectorySeparatorChar + "result.txt";
             using (Stream outputStream = File.OpenWrite(resultfile))
@@ -54,6 +60,77 @@ internal partial class Program
                 return result;
             }
             File.WriteAllLines(fileName, File.ReadLines(fileName).Where(l => Match(l)).ToList());
+        }
+
+        public static void InsertFromFileToDB(string fileName, MySqlConnection conn)
+        {
+
+            MySqlBulkLoader bl = new MySqlBulkLoader(conn)
+                {
+                    Columns = { "@a, estring, rstring, int_num, @d" },
+                    Expressions = { "float_num=replace(@d,',','.')", "date=STR_TO_DATE(@a, '%d.%m.%Y')" }
+                };
+            bl.Local = true;
+            bl.TableName = "tbl";
+            bl.FieldTerminator = "||";
+            bl.LineTerminator = "\n";
+            bl.FileName = "Files\\0.txt";//fileName
+            try
+            {
+                Console.WriteLine("Connecting to MySQL...");
+                conn.Open();
+
+                // Upload data from file
+                int count = bl.Load();
+                Console.WriteLine(count + " lines uploaded.");
+
+                conn.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: " + e.Message);
+            }
+        }
+
+        public static string IntSumAndFloatMedian(MySqlConnection conn)
+        {
+            try
+            {
+                Console.WriteLine("Connecting to MySQL...");
+                conn.Open();
+
+                string res = "";
+                string sql = "SELECT SUM(int_num)  FROM tbl";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                MySqlDataReader rdr = cmd.ExecuteReader();
+
+                rdr.Read();
+                res += rdr[0];
+                rdr.Close();
+
+                sql =
+                    "SET @row_index := -1;" +
+                    "SELECT AVG(subq.float_num) as median_value" +
+                    " FROM ( SELECT @row_index:=@row_index + 1 AS row_index, float_num" +
+                    " FROM tbl ORDER BY float_num )" +
+                    " AS subq WHERE subq.row_index  IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2));";
+
+                cmd = new MySqlCommand(sql, conn);
+                rdr = cmd.ExecuteReader();
+
+                rdr.Read();
+                res += " "+ rdr[0];
+                rdr.Close();
+
+                conn.Close();
+
+                return res;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return "";
+            }
         }
     }
 }

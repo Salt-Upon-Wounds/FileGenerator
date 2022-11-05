@@ -61,7 +61,7 @@
                    GenEngStr() + "||" +
                    GenRuStr() + "||" +
                    GenInteger() + "||" +
-                   GenFloating() + "||";
+                   GenFloating().ToString("0.00000000") + "||";
 
         }
     }
