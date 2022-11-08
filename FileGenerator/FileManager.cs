@@ -78,14 +78,10 @@ internal partial class Program
             bl.FileName = fileName;
             try
             {
-                Console.WriteLine("Connecting to MySQL...");
-                conn.Open();
-
                 // Upload data from file
                 int count = bl.Load();
                 Console.WriteLine(count + " lines uploaded.");
 
-                conn.Close();
             }
             catch (Exception e)
             {
@@ -107,9 +103,6 @@ internal partial class Program
         {
             try
             {
-                Console.WriteLine("Connecting to MySQL...");
-                conn.Open();
-
                 string res = "";
                 string sql = "SELECT SUM(int_num)  FROM tbl";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
@@ -133,7 +126,7 @@ internal partial class Program
                 res += " "+ rdr[0];
                 rdr.Close();
 
-                conn.Close();
+                
 
                 return res;
             }
