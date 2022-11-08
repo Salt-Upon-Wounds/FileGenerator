@@ -20,14 +20,16 @@ internal partial class Program
                     + database + ";Port=" + port + ";User ID=" + username + ";Password=" + password + ";AllowLoadLocalInfile=true;Allow User Variables=true";
         
         MySqlConnection conn = new MySqlConnection(connString);
+
+        Console.WriteLine("1. сгенерировать файлы в отдельной папке");
+        Console.WriteLine("2. объединить файлы в один result.txt рядом с экзешником");
+        Console.WriteLine("3. занести файлы из папки в бд");
+        Console.WriteLine("4. получить сумму целых и медиану дробных");
+        Console.WriteLine("5. Выйти");
+
         int i = 0;
         while (true)
         {
-            Console.WriteLine("1. сгенерировать файлы в отдельной папке");
-            Console.WriteLine("2. объединить файлы в один result.txt рядом с экзешником");
-            Console.WriteLine("3. занести файлы из папки в бд");
-            Console.WriteLine("4. получить сумму целых и медиану дробных");
-            Console.WriteLine("5. Выйти");
             Console.Write("Введите номер пункта: ");
             int.TryParse(Console.ReadLine(), out i);
             switch (i)
@@ -42,11 +44,10 @@ internal partial class Program
                         break;
                     }
                 case 3: FileManager.InsertAll(conn); break;
-                case 4: FileManager.IntSumAndFloatMedian(conn); break;
+                case 4: Console.WriteLine(FileManager.IntSumAndFloatMedian(conn)); break;
                 case 5: return;
                 default: break;
             }
-            Console.Clear();
         }
     }
 }

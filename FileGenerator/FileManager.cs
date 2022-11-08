@@ -43,6 +43,7 @@ internal partial class Program
                     using (Stream inputStream = File.OpenRead(inputFile))
                     {
                         inputStream.CopyTo(outputStream);
+                        Console.WriteLine("File " + inputFile + " uploaded");
                     }
                 }
             }
@@ -55,7 +56,7 @@ internal partial class Program
                 bool result = true;
                 Parallel.For(0, strings.Length, i =>
                 {
-                    if (Regex.IsMatch(str, Regex.Escape(strings[i]))) result = false;
+                    if (!string.IsNullOrEmpty(strings[i]) && Regex.IsMatch(str, Regex.Escape(strings[i]))) result = false;
                 });
                 return result;
             }
@@ -74,7 +75,7 @@ internal partial class Program
             bl.TableName = "tbl";
             bl.FieldTerminator = "||";
             bl.LineTerminator = "\n";
-            bl.FileName = "fileName";//fileName
+            bl.FileName = fileName;
             try
             {
                 Console.WriteLine("Connecting to MySQL...");
@@ -95,10 +96,9 @@ internal partial class Program
         public static void InsertAll(MySqlConnection conn)
         {
             var files = Directory.GetFiles("Files");
-            int f = 0;
             foreach (string inputFile in files)
             {
-                Console.WriteLine("File: " + ++f);
+                Console.WriteLine("File: " + inputFile);
                 InsertFromFileToDB(inputFile, conn);
             }
         }
