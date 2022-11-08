@@ -99,6 +99,19 @@ internal partial class Program
             }
         }
 
+        /// <summary>
+        /// SELECT SUM(int_num)  FROM tbl;
+        /// 
+        /// SET @row_index := -1;
+        /// SELECT AVG(subq.float_num) as median_value
+        ///     FROM ( 
+        ///         SELECT @row_index:=@row_index + 1 AS row_index, float_num
+        ///             FROM tbl ORDER BY float_num 
+        ///          )
+        /// AS subq WHERE subq.row_index  IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2));
+        /// </summary>
+        /// <param name="conn"></param>
+        /// <returns></returns>
         public static string IntSumAndFloatMedian(MySqlConnection conn)
         {
             try

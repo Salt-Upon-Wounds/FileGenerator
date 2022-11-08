@@ -1,9 +1,9 @@
 ﻿internal partial class Program
 {
-    public static class StaticRandom
-    {
-        
-    }
+    /// <summary>
+    /// Класс предоставляет статические методы для генерации псевдослучайных данных с возможностью генерировать 
+    /// во множестве потоков
+    /// </summary>
     public static class Generators
     {
         static int seed = Environment.TickCount;
