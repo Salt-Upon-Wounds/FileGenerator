@@ -30,12 +30,12 @@ internal partial class Program
         
         public static void FilesUnion()
         {
-            if (File.Exists("Files" + Path.DirectorySeparatorChar + "result.txt"))
+            if (File.Exists("result.txt"))
             {
-                File.Delete("Files" + Path.DirectorySeparatorChar + "result.txt");
+                File.Delete("result.txt");
             }
             var files = Directory.GetFiles("Files");
-            var resultfile = "Files" + Path.DirectorySeparatorChar + "result.txt";
+            var resultfile = "result.txt";
             using (Stream outputStream = File.OpenWrite(resultfile))
             {
                 foreach (string inputFile in files)
@@ -74,7 +74,7 @@ internal partial class Program
             bl.TableName = "tbl";
             bl.FieldTerminator = "||";
             bl.LineTerminator = "\n";
-            bl.FileName = "Files\\0.txt";//fileName
+            bl.FileName = "fileName";//fileName
             try
             {
                 Console.WriteLine("Connecting to MySQL...");
@@ -89,6 +89,17 @@ internal partial class Program
             catch (Exception e)
             {
                 Console.WriteLine("Error: " + e.Message);
+            }
+        }
+
+        public static void InsertAll(MySqlConnection conn)
+        {
+            var files = Directory.GetFiles("Files");
+            int f = 0;
+            foreach (string inputFile in files)
+            {
+                Console.WriteLine("File: " + ++f);
+                InsertFromFileToDB(inputFile, conn);
             }
         }
 
